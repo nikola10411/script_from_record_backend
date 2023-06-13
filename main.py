@@ -40,6 +40,11 @@ def generate_data(prompt):
     return script_response.choices[0].text.strip()
 
 
+@app.route('/status', methods=['GET'])
+def status_checking():
+    return "Server is up now."
+
+
 @app.route('/api/upload_record', methods=['POST'])
 def upload_record():
     if "record" not in request.files:
