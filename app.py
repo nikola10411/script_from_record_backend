@@ -3,7 +3,7 @@ import random
 
 import openai
 from deepgram import Deepgram
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Response
 from flask_cors import CORS
 from dotenv import load_dotenv
 
@@ -128,15 +128,14 @@ def generate_file_name():
 def generate_data(messages):
     if messages is None:
         messages = []
-    script_response = openai.ChatCompletion.create(
+    return openai.ChatCompletion.create(
         model="gpt-4-32k-0613",
         temperature=0,
         top_p=1,
         messages=messages,
         max_tokens=2048,
+        stream=True
     )
-
-    return script_response.choices[0].message.content
 
 
 @app.route('/status', methods=['GET'])
@@ -212,7 +211,13 @@ def get_script_v2():
     if len(coming_messages) > 0:
         messages.extend(coming_messages)
 
-    return generate_data(messages)
+    def event_stream():
+        for line in generate_data(messages=messages):
+            text = line.choices[0].delta.get('content', '')
+            if len(text):
+                yield text
+
+    return Response(event_stream(), mimetype='text/event-stream')
 
 
 @app.route('/api/get_script', methods=['POST'])
