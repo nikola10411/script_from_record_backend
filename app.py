@@ -182,6 +182,8 @@ def get_transcript():
             source,
             {
                 'punctuate': True,
+                'tier': 'nova',
+                'model': 'phonecall'
             }
         )
 
