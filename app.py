@@ -189,6 +189,8 @@ def get_transcript():
 
         transcript = response['results']['channels'][0]['alternatives'][0]['transcript']
 
+    os.remove(file_path)
+
     return transcript
 
 
